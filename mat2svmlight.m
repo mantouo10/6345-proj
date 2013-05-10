@@ -1,9 +1,12 @@
 % convert matlab data to svmlight format
-load data/fbank-invariance-features-bigarray-vec.mat
+n_bin = 4;
+n_tmpl = 800;
+
+load(sprintf('data/fbank-invariance-features-bigarray-vec-%d-%d.mat', n_tmpl, n_bin));
 
 configs = {
-  'data/fbank-vec-train.svmlight', features_tr, trainlab;
-  'data/fbank-vec-dev.svmlight', features_dev, devsetlab
+  sprintf('data/fbank-vec-train-%d-%d.svmlight', n_tmpl, n_bin), features_tr, trainlab;
+  sprintf('data/fbank-vec-dev-%d-%d.svmlight', n_tmpl, n_bin) features_dev, devsetlab
 };
 
 for i = 1:size(configs,1)
@@ -17,6 +20,9 @@ for i = 1:size(configs,1)
             fprintf(1, '%d\n', j);
         end
         txt = [1:size(features,2); features(j,:)];
+        nz_idx = txt(2,:) ~= 0; % no need to write zero entries
+        txt = txt(:, nz_idx);
+
         fprintf(fid, '%d', labels_mg(j));
         fprintf(fid, ' %d:%f', txt(:));
         fprintf(fid, '\n');

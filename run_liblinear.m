@@ -1,10 +1,12 @@
 addpath liblinear/liblinear-1.93/matlab
 
+n_tmpl = 1600;
+n_bin = 4;
+
 % load data
-%load('data/fbank-invariance-features-bigarray-compact-debug.mat');
-if ~exist('features_tr', 'var')
+if ~exist('features_tr', 'var') || size(features_tr,2) ~= n_bin*61
     fprintf(1, 'loading data...\n');
-    load('data/fbank-invariance-features-bigarray-vec.mat');
+    load(sprintf('data/fbank-invariance-features-bigarray-vec-%d-%d.mat', n_tmpl, n_bin));
     fprintf(1, 'load data done...\n');
 end
 

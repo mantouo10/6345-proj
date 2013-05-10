@@ -1,25 +1,29 @@
 %clear
-load data/AllFbankdata_norm_memo.mat
-load data/templates/fbank-tmpls-vector.mat
+n_bin = 4;
+n_tmpl = 3200;
+
+%load data/AllFbankdata_norm_memo.mat
+load(sprintf('data/templates/fbank-tmpls-vector-%d.mat', n_tmpl));
+
 
 features_tr = cell(size(traindata));
 n_train = length(features_tr);
 
 parfor i=1:n_train
     fprintf(1, '%d / %d...\n', i, n_train);
-    features_tr{i} = extract_frame_feature_vec(traindata{i}, tmpls_all, n_tmpl_per_phone);
+    features_tr{i} = extract_frame_feature_vec(traindata{i}, tmpls_all, n_tmpl_per_phone, n_bin);
 end
 
 features_dev = cell(size(devsetdata));
 n_dev = length(features_dev);
 parfor i=1:n_dev
     fprintf(1, '%d / %d...\n', i, n_dev);
-    features_dev{i} = extract_frame_feature_vec(devsetdata{i}, tmpls_all, n_tmpl_per_phone);
+    features_dev{i} = extract_frame_feature_vec(devsetdata{i}, tmpls_all, n_tmpl_per_phone, n_bin);
 end
 
-%save data/fbank-invariance-features-vec.mat -v7.3 'features_tr' 'features_dev' 'trainlab' 'devsetlab'
+save(sprintf('data/fbank-invariance-features-vec-%d-%d.mat', n_tmpl, n_bin), '-v7.3', 'features_tr', 'features_dev', 'trainlab', 'devsetlab');
 
-%load data/fbank-invariance-features-vec.mat
+%load(sprintf('data/fbank-invariance-features-vec-%d-%d.mat', n_tmpl, n_bin));
 
 n_train = length(features_tr);
 for i=1:n_train
@@ -42,4 +46,4 @@ features_dev = cell2mat(features_dev)';
 trainlab = [trainlab{:}];
 devsetlab = [devsetlab{:}];
 
-save data/fbank-invariance-features-bigarray-vec.mat -v7.3 'features_tr' 'features_dev' 'trainlab' 'devsetlab'
+save(sprintf('data/fbank-invariance-features-bigarray-vec-%d-%d.mat', n_tmpl, n_bin), '-v7.3', 'features_tr', 'features_dev', 'trainlab', 'devsetlab');

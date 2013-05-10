@@ -12,7 +12,7 @@ phones = [90 91 92; ... % ih
 
 phones = reshape(1:183, 3, 61)';
 
-n_tmpl_per_phone = 800;
+n_tmpl_per_phone = 3200;
 tmpls_all = zeros(n_tmpl_per_phone*size(phones,1), size(traindata{1},2));
 
 for ip = 1:length(phones)
@@ -34,4 +34,4 @@ for ip = 1:length(phones)
     end
 end
 
-save('data/templates/fbank-tmpls-vector.mat', 'tmpls_all', 'n_tmpl_per_phone');
+save(sprintf('data/templates/fbank-tmpls-vector-%d.mat', n_tmpl_per_phone), 'tmpls_all', 'n_tmpl_per_phone');

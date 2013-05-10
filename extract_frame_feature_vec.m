@@ -1,7 +1,7 @@
-function fea = extract_frame_feature_vec(fbank, tmpl, n_tmpl_per_phone)
+function fea = extract_frame_feature_vec(fbank, tmpl, n_tmpl_per_phone, n_bin)
 
 % params
-n_bin = 4;%20;
+%n_bin = 4;%20;
 
 hist_bins = linspace(-1, 1, n_bin+1);
 
