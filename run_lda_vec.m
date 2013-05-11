@@ -1,7 +1,9 @@
-n_tmpl = 3200;
+n_tmpl = 1600;
 n_bin = 4;
+profile = '39c';
 
-load(sprintf('data/fbank-invariance-features-bigarray-vec-%d-%d.mat', n_tmpl, n_bin));
+load(sprintf('data/fbank-invariance-features-bigarray-%s-%d-%d.mat', profile, n_tmpl, n_bin));
+%load data/fbank-invariance-features-bigarray-compact-debug.mat
 
 trainlab_mg = 1+floor((trainlab-1)/3);
 devsetlab_mg = 1+floor((devsetlab-1)/3);

@@ -1,4 +1,4 @@
-load data/fbank-invariance-features-vec.mat
+load data/fbank-invariance-features-vec-3200-15.mat
 
 configs = { ...
   {features_tr, trainlab, 'data/htk-train-vec', 'data/train_data_order.txt'},  ...
@@ -31,6 +31,7 @@ for ii = 1:length(configs)
         fid = fopen([targetfile(1:end-4) 'label'],'w');
         label = labels{i};
         label = label(1:size(features{i},1));
+        label = 1+floor((label-1)/3); % map 183 classes back to 61 classes
         for j = 1:length(label)
             fprintf(fid,'%d\n',label(j));
         end
