@@ -4,13 +4,13 @@ addpath liblinear/liblinear-1.93/matlab
 s = RandStream('mt19937ar','Seed',3085);
 RandStream.setDefaultStream(s);
 
-profile = '61c';
+profile = '39c';
 n_tmpl = 3200;
 n_bin = 4;
 
 liblinear_param = '-s 2 -c 100 -B 1';
-n_train = 500;
-normalization = 'whiten-tiknov';
+n_train = inf;
+normalization = 'none';
 
 fprintf(1, '------------------- Experiment Summary --------------------\n');
 fprintf(1, 'Features: %s-%d-%d\n', profile, n_tmpl, n_bin);
@@ -21,8 +21,8 @@ fprintf(1, '-----------------------------------------------------------\n');
 
 % load data
 fprintf(1, 'loading data...\n');
-%load data/fbank-invariance-features-bigarray-compact-debug.mat
-load(sprintf('data/fbank-invariance-features-bigarray-%s-%d-%d.mat', profile, n_tmpl, n_bin));
+load data/fbank-invariance-features-bigarray-compact-debug.mat
+%load(sprintf('data/fbank-invariance-features-bigarray-%s-%d-%d.mat', profile, n_tmpl, n_bin));
 
 trainlab_mg = 1+floor((trainlab-1)/3);
 devsetlab_mg = 1+floor((devsetlab-1)/3);
@@ -50,8 +50,10 @@ if strcmp(normalization, 'whiten-spec') || strcmp(normalization, 'whiten-tiknov'
     elseif strcmp(normalization, 'whiten-tiknov')
         D = 1 ./ sqrt(1e-5 + D);
     elseif strcmp(normalization, 'pca')
-        D = ones(size(D));
+        D(D ~= 0) = 1;
     end
+    V = V(:,D~=0); D = D(D ~= 0);
+
     W = V*diag(D)*V';
     nor_features_tr = X*W;
     nor_features_dev = bsxfun(@minus, nor_features_dev, the_mean)*W;

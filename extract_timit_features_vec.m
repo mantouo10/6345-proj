@@ -1,6 +1,6 @@
 clear
 n_bin = 4;
-n_tmpl = 1600;
+n_tmpl = 3200;
 profile = '39c';
 
 load data/AllFbankdata_norm_memo.mat

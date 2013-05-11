@@ -1,6 +1,6 @@
 load data/AllFbankdata_norm_memo.mat
 
-n_tmpl_per_phone = 1600;
+n_tmpl_per_phone = 3200;
 profile = '39c';
 
 if strcmp(profile, 'foobar')

@@ -1,4 +1,4 @@
-n_tmpl = 1600;
+n_tmpl = 3200;
 n_bin = 4;
 profile = '39c';
 
