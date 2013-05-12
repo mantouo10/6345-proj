@@ -2,6 +2,10 @@ load data/AllFbankdata_norm_memo.mat
 
 n_tmpl_per_phone = 3200;
 profile = '39c';
+% whether enforce every speaker contributes the same # of templates
+balance_speaker = 0; 
+use_delta = 1;
+stack_num = 3;
 
 if strcmp(profile, 'foobar')
     phones = { ...
@@ -67,29 +71,74 @@ else
     error('unknown profile: %s', profile);
 end
 
-tmpls_all = zeros(n_tmpl_per_phone*size(phones,1), size(traindata{1},2));
+if balance_speaker
+    spk = load('speaker_index.mat');
+    spk_index = logical(spk.index);
+else
+    % pretend there is only one speaker
+    spk_index = true(1, length(trainlab));
+end
+
+speaker_num = size(spk_index, 1);
+nt_per_spk = ceil(n_tmpl_per_phone/speaker_num);
+n_tmpl_per_phone_real = nt_per_spk*speaker_num;
+
+tmp = do_stack(traindata{1}, stack_num, use_delta);
+tmpls_all = zeros(n_tmpl_per_phone_real*size(phones,1), size(tmp,2));
+
+fprintf(1, 'True #tmpl per phone: %d\n', n_tmpl_per_phone_real);
 
 for ip = 1:length(phones)
-    for it = 1:n_tmpl_per_phone
+    fprintf(1, 'phone %d...\n', ip);
+    tpl_idx = 1;
+    while tpl_idx <= n_tmpl_per_phone_real
+        % this while loop is to avoid the case where some speaker
+        % never speaked some phone in the corpus
 
-        while true
-            % find a random phone
-            ist = randsample(1:length(trainlab), 1);
-            lab = trainlab{ist};
-            idx = false(size(lab));
-            for j = 1:length(phones{ip})
-                idx = idx | (lab == phones{ip}(j));
+        for ispk = 1:speaker_num
+            trainlab_spk = trainlab(spk_index(ispk, :));
+            traindata_spk = traindata(spk_index(ispk, :));
+
+            for it = 1:nt_per_spk
+                max_try = 200;
+                for itry = 1:max_try
+                    % find a random phone
+                    ist = randsample(1:length(trainlab_spk), 1);
+                    lab = trainlab_spk{ist};
+                    idx = false(size(lab));
+                    for j = 1:length(phones{ip})
+                        idx = idx | (lab == phones{ip}(j));
+                    end
+                    idx = find(idx);
+                    if length(idx) < 1
+                        continue;
+                    end
+                    break;
+                end
+
+                if length(idx) < 1
+                    % maybe the speaker never say this phone
+                    break;
+                end
+            
+                fea_sentence = do_stack(traindata_spk{ist}, stack_num, use_delta);
+                tmpl_v = fea_sentence(randsample(idx,1), :);
+                tmpls_all((ip-1)*n_tmpl_per_phone_real + tpl_idx, :) = tmpl_v / norm(tmpl_v);
+                tpl_idx = tpl_idx + 1;
             end
-            idx = find(idx);
-            if length(idx) < 1
-                continue;
-            end
-            break;
         end
-        
-        tmpl_v = traindata{ist}(randsample(idx,1), :);
-        tmpls_all((ip-1)*n_tmpl_per_phone + it, :) = tmpl_v / norm(tmpl_v);
     end
 end
 
-save(sprintf('data/templates/fbank-tmpls-%s-%d.mat', profile, n_tmpl_per_phone), 'tmpls_all', 'n_tmpl_per_phone');
+if balance_speaker
+    profile = ['bspk-' profile];
+end
+if ~use_delta
+    profile = ['nodelta-' profile];
+end
+if stack_num > 0
+    profile = sprintf('stk%d-%s', stack_num, profile);
+end
+filename = sprintf('data/templates/fbank-tmpls-%s-%d.mat', profile, n_tmpl_per_phone);
+n_tmpl_per_phone = n_tmpl_per_phone_real;
+save(filename, 'tmpls_all', 'n_tmpl_per_phone', 'use_delta', 'stack_num');

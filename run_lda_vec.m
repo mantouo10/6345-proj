@@ -1,6 +1,6 @@
 n_tmpl = 3200;
 n_bin = 4;
-profile = '39c';
+profile = 'nodelta-39c';
 
 load(sprintf('data/fbank-invariance-features-bigarray-%s-%d-%d.mat', profile, n_tmpl, n_bin));
 %load data/fbank-invariance-features-bigarray-compact-debug.mat

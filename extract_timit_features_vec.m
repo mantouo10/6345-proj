@@ -1,25 +1,32 @@
 clear
 n_bin = 4;
 n_tmpl = 3200;
-profile = '39c';
+profile = 'nodelta-39c';
 
 load data/AllFbankdata_norm_memo.mat
 load(sprintf('data/templates/fbank-tmpls-%s-%d.mat', profile, n_tmpl));
-
+if ~exist('use_delta', 'var')
+    use_delta = 1;
+end
+if ~exist('stack_num', 'var')
+    stack_num = 0;
+end
 
 features_tr = cell(size(traindata));
 n_train = length(features_tr);
 
 parfor i=1:n_train
     fprintf(1, '%d / %d...\n', i, n_train);
-    features_tr{i} = extract_frame_feature_vec(traindata{i}, tmpls_all, n_tmpl_per_phone, n_bin);
+    features_tr{i} = extract_frame_feature_vec(do_stack(traindata{i}, stack_num, use_delta), ...
+        tmpls_all, n_tmpl_per_phone, n_bin);
 end
 
 features_dev = cell(size(devsetdata));
 n_dev = length(features_dev);
 parfor i=1:n_dev
     fprintf(1, '%d / %d...\n', i, n_dev);
-    features_dev{i} = extract_frame_feature_vec(devsetdata{i}, tmpls_all, n_tmpl_per_phone, n_bin);
+    features_dev{i} = extract_frame_feature_vec(do_stack(devsetdata{i}, stack_num, use_delta), ...
+        tmpls_all, n_tmpl_per_phone, n_bin);
 end
 
 save(sprintf('data/fbank-invariance-features-%s-%d-%d.mat', profile, n_tmpl, n_bin), '-v7.3', 'features_tr', 'features_dev', 'trainlab', 'devsetlab');

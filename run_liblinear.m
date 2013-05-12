@@ -4,13 +4,13 @@ addpath liblinear/liblinear-1.93/matlab
 s = RandStream('mt19937ar','Seed',3085);
 RandStream.setDefaultStream(s);
 
-profile = '39c';
+profile = '61c';
 n_tmpl = 3200;
-n_bin = 4;
+n_bin = 15;
 
-liblinear_param = '-s 2 -c 100 -B 1';
+liblinear_param = '-s 0 -c 100 -B 1';
 n_train = inf;
-normalization = 'none';
+normalization = 'pca';
 
 fprintf(1, '------------------- Experiment Summary --------------------\n');
 fprintf(1, 'Features: %s-%d-%d\n', profile, n_tmpl, n_bin);
@@ -21,8 +21,8 @@ fprintf(1, '-----------------------------------------------------------\n');
 
 % load data
 fprintf(1, 'loading data...\n');
-load data/fbank-invariance-features-bigarray-compact-debug.mat
-%load(sprintf('data/fbank-invariance-features-bigarray-%s-%d-%d.mat', profile, n_tmpl, n_bin));
+%load data/fbank-invariance-features-bigarray-compact-debug.mat
+load(sprintf('data/fbank-invariance-features-bigarray-%s-%d-%d.mat', profile, n_tmpl, n_bin));
 
 trainlab_mg = 1+floor((trainlab-1)/3);
 devsetlab_mg = 1+floor((devsetlab-1)/3);
