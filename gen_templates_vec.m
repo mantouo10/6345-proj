@@ -4,8 +4,8 @@ n_tmpl_per_phone = 3200;
 profile = '39c';
 % whether enforce every speaker contributes the same # of templates
 balance_speaker = 0; 
-use_delta = 1;
-stack_num = 3;
+use_delta = 0;
+stack_num = 7;
 
 if strcmp(profile, 'foobar')
     phones = { ...
@@ -141,4 +141,4 @@ if stack_num > 0
 end
 filename = sprintf('data/templates/fbank-tmpls-%s-%d.mat', profile, n_tmpl_per_phone);
 n_tmpl_per_phone = n_tmpl_per_phone_real;
-save(filename, 'tmpls_all', 'n_tmpl_per_phone', 'use_delta', 'stack_num');
+save(filename, '-v7.3', 'tmpls_all', 'n_tmpl_per_phone', 'use_delta', 'stack_num');

@@ -4,11 +4,11 @@ addpath liblinear/liblinear-1.93/matlab
 s = RandStream('mt19937ar','Seed',3085);
 RandStream.setDefaultStream(s);
 
-profile = '61c';
+profile = 'stk7-39c';
 n_tmpl = 3200;
-n_bin = 15;
+n_bin = 4;
 
-liblinear_param = '-s 0 -c 100 -B 1';
+liblinear_param = '-s 2 -c 100 -B 1';
 n_train = inf;
 normalization = 'pca';
 

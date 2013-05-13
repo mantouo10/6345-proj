@@ -1,7 +1,7 @@
 clear
 n_bin = 4;
 n_tmpl = 3200;
-profile = 'nodelta-39c';
+profile = 'stk7-nodelta-39c';
 
 load data/AllFbankdata_norm_memo.mat
 load(sprintf('data/templates/fbank-tmpls-%s-%d.mat', profile, n_tmpl));
