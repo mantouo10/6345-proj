@@ -2,14 +2,18 @@ n_tmpl_per_phone = 3200;
 profile = '39c';
 % whether enforce every speaker contributes the same # of templates
 balance_speaker = 0; 
-use_delta = 0;
-stack_num = 3;
-raw_fbank = 1; % use un-whiten-ed fbank for feature extraction
+use_delta = 1;
+stack_num = 0;
+which_fbank = 'unitstd'; % 'whiten', 'submean', 'unitstd'
 
-if raw_fbank
+if strcmp(which_fbank, 'whiten')
     load data/AllFbankdata_nonorm_memo.mat
+elseif strcmp(which_fbank, 'submean')
+    load data/AllFbankdata_submean_memo.mat
+elseif strcmp(which_fbank, 'unitstd')
+    load data/AllFbankdata_unitstd_memo.mat
 else
-    load data/AllFbankdata_norm_memo.mat
+    error('Unknown fbank feature: %s', which_fbank);
 end
 
 if strcmp(profile, 'foobar')
@@ -152,10 +156,12 @@ end
 if stack_num > 0
     profile = sprintf('stk%d-%s', stack_num, profile);
 end
-if raw_fbank
-    profile = ['rawfb-' profile];
+if strcmp(which_fbank, 'submean')
+    profile = ['smfb-' profile];
+elseif strcmp(which_fbank, 'unitstd')
+    profile = ['usfb-' profile];
 end
 
 filename = sprintf('data/templates/fbank-tmpls-%s-%d.mat', profile, n_tmpl_per_phone);
 n_tmpl_per_phone = n_tmpl_per_phone_real;
-save(filename, '-v7.3', 'tmpls_all', 'n_tmpl_per_phone', 'use_delta', 'stack_num', 'raw_fbank');
+save(filename, '-v7.3', 'tmpls_all', 'n_tmpl_per_phone', 'use_delta', 'stack_num', 'which_fbank');

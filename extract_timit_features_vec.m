@@ -11,14 +11,18 @@ end
 if ~exist('stack_num', 'var')
     stack_num = 0;
 end
-if ~exist('raw_fbank', 'var')
-    raw_fbank = 0;
+if ~exist('which_fbank', 'var')
+    which_fbank = 'whiten';
 end
 
-if raw_fbank
+if strcmp(which_fbank, 'whiten')
     load data/AllFbankdata_nonorm_memo.mat
+elseif strcmp(which_fbank, 'submean')
+    load data/AllFbankdata_submean_memo.mat
+elseif strcmp(which_fbank, 'unitstd')
+    load data/AllFbankdata_unitstd_memo.mat
 else
-    load data/AllFbankdata_norm_memo.mat
+    error('Unknown fbank feature: %s', which_fbank);
 end
 
 
@@ -28,7 +32,7 @@ if n_fband > 1
     profile = sprintf('bnd%d-%s', n_fband, profile);
 end
 
-for i=1:n_train
+parfor i=1:n_train
     fprintf(1, '%d / %d...\n', i, n_train);
     features_tr{i} = extract_frame_feature_vec(do_stack(traindata{i}, stack_num, use_delta), ...
         tmpls_all, n_tmpl_per_phone, n_bin, n_fband);
@@ -36,7 +40,7 @@ end
 
 features_dev = cell(size(devsetdata));
 n_dev = length(features_dev);
-for i=1:n_dev
+parfor i=1:n_dev
     fprintf(1, '%d / %d...\n', i, n_dev);
     features_dev{i} = extract_frame_feature_vec(do_stack(devsetdata{i}, stack_num, use_delta), ...
         tmpls_all, n_tmpl_per_phone, n_bin, n_fband);

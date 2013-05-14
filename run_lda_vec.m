@@ -1,10 +1,18 @@
 n_tmpl = 3200;
 n_bin = 15;
-profile = 'stk3-61c';
+profile = 'stk5-61c';
 combine_fbank = 0;
-normalization = 'pca';
+normalization = 'none';
+
+fprintf(1, '--- LDA -------------------\n');
+fprintf(1, 'profile: %s\n', profile);
+fprintf(1, 'n_tmpl: %d\n', n_tmpl);
+fprintf(1, 'n_bin: %d\n', n_bin);
+fprintf(1, 'normalization: %s\n', normalization);
+fprintf(1, '---------------------------\n');
 
 load(sprintf('data/fbank-invariance-features-bigarray-%s-%d-%d.mat', profile, n_tmpl, n_bin));
+%load data/fbank-stack1.mat
 
 if combine_fbank
     fprintf(1, 'combining with fbank feature...\n');
