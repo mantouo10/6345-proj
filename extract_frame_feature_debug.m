@@ -6,6 +6,7 @@ w_time  = size(tmpl, 1);
 
 n_frames = size(fbank, 1) - w_time + 1;
 
-fea = fbank(1:n_frames, :);
+%fea = fbank(1:n_frames, :);
+fea = fbank;
 
 end

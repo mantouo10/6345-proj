@@ -1,11 +1,16 @@
-load data/AllFbankdata_norm_memo.mat
-
 n_tmpl_per_phone = 3200;
 profile = '39c';
 % whether enforce every speaker contributes the same # of templates
 balance_speaker = 0; 
 use_delta = 0;
-stack_num = 7;
+stack_num = 3;
+raw_fbank = 1; % use un-whiten-ed fbank for feature extraction
+
+if raw_fbank
+    load data/AllFbankdata_nonorm_memo.mat
+else
+    load data/AllFbankdata_norm_memo.mat
+end
 
 if strcmp(profile, 'foobar')
     phones = { ...
@@ -62,7 +67,7 @@ elseif strcmp(profile, '39c')
         [30,31,32,39,40,41,78,79,80,135,136,137,153,154,155,105,106,107,63,64,65,132,133,134,81,82,83,138,139,140],
     };
 elseif strcmp(profile, '61c')
-    phones_m = reshape(1:183, 3, 61)';
+    phones_m = reshape(1:183, 3, 61);
     phones = cell(61,1);
     for i=1:length(phones)
         phones{i} = phones_m(:,i);
@@ -125,10 +130,18 @@ for ip = 1:length(phones)
                 tmpl_v = fea_sentence(randsample(idx,1), :);
                 tmpls_all((ip-1)*n_tmpl_per_phone_real + tpl_idx, :) = tmpl_v / norm(tmpl_v);
                 tpl_idx = tpl_idx + 1;
+                if tpl_idx > n_tmpl_per_phone_real
+                    break
+                end
+            end
+            if tpl_idx > n_tmpl_per_phone_real
+                break
             end
         end
     end
 end
+
+assert(size(tmpls_all,1) == n_tmpl_per_phone_real*size(phones,1));
 
 if balance_speaker
     profile = ['bspk-' profile];
@@ -139,6 +152,10 @@ end
 if stack_num > 0
     profile = sprintf('stk%d-%s', stack_num, profile);
 end
+if raw_fbank
+    profile = ['rawfb-' profile];
+end
+
 filename = sprintf('data/templates/fbank-tmpls-%s-%d.mat', profile, n_tmpl_per_phone);
 n_tmpl_per_phone = n_tmpl_per_phone_real;
-save(filename, '-v7.3', 'tmpls_all', 'n_tmpl_per_phone', 'use_delta', 'stack_num');
+save(filename, '-v7.3', 'tmpls_all', 'n_tmpl_per_phone', 'use_delta', 'stack_num', 'raw_fbank');
