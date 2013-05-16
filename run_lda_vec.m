@@ -1,5 +1,5 @@
 n_tmpl = 3200;
-n_bin = 15;
+pool_profile = 'mean';
 profile = 'stk5-61c';
 combine_fbank = 0;
 normalization = 'none';
@@ -7,11 +7,11 @@ normalization = 'none';
 fprintf(1, '--- LDA -------------------\n');
 fprintf(1, 'profile: %s\n', profile);
 fprintf(1, 'n_tmpl: %d\n', n_tmpl);
-fprintf(1, 'n_bin: %d\n', n_bin);
+fprintf(1, 'pool_profile: %s\n', pool_profile);
 fprintf(1, 'normalization: %s\n', normalization);
 fprintf(1, '---------------------------\n');
 
-load(sprintf('data/fbank-invariance-features-bigarray-%s-%d-%d.mat', profile, n_tmpl, n_bin));
+load(sprintf('data/fbank-invariance-features-bigarray-%s-%d-%s.mat', profile, n_tmpl, pool_profile));
 %load data/fbank-stack1.mat
 
 if combine_fbank

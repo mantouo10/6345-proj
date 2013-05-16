@@ -1,5 +1,5 @@
 clear
-n_bin = 15;
+n_bin = 'mean';
 n_tmpl = 3200;
 profile = 'stk5-61c';
 n_fband = 1;
@@ -46,9 +46,14 @@ parfor i=1:n_dev
         tmpls_all, n_tmpl_per_phone, n_bin, n_fband);
 end
 
-save(sprintf('data/fbank-invariance-features-%s-%d-%d.mat', profile, n_tmpl, n_bin), '-v7.3', 'features_tr', 'features_dev', 'trainlab', 'devsetlab');
+if isnumeric(n_bin)
+    pool_profile = sprintf('%d', n_bin);
+else
+    pool_profile = n_bin;
+end
+save(sprintf('data/fbank-invariance-features-%s-%d-%s.mat', profile, n_tmpl, pool_profile), '-v7.3', 'features_tr', 'features_dev', 'trainlab', 'devsetlab');
 
-%load(sprintf('data/fbank-invariance-features-%s-%d-%d.mat', profile, n_tmpl, n_bin));
+%load(sprintf('data/fbank-invariance-features-%s-%d-%s.mat', profile, n_tmpl, pool_profile));
 
 n_train = length(features_tr);
 for i=1:n_train
@@ -71,4 +76,4 @@ features_dev = cell2mat(features_dev)';
 trainlab = [trainlab{:}];
 devsetlab = [devsetlab{:}];
 
-save(sprintf('data/fbank-invariance-features-bigarray-%s-%d-%d.mat', profile, n_tmpl, n_bin), '-v7.3', 'features_tr', 'features_dev', 'trainlab', 'devsetlab');
+save(sprintf('data/fbank-invariance-features-bigarray-%s-%d-%s.mat', profile, n_tmpl, pool_profile), '-v7.3', 'features_tr', 'features_dev', 'trainlab', 'devsetlab');
