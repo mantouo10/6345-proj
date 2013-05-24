@@ -1,6 +1,6 @@
-n_tmpl = 3200;
+n_tmpl = 1;
 pool_profile = 'mean';
-profile = 'stk5-61c';
+profile = 'stk5-183c';
 combine_fbank = 0;
 normalization = 'none';
 

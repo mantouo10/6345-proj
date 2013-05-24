@@ -1,7 +1,7 @@
 clear
 n_bin = 'mean';
-n_tmpl = 3200;
-profile = 'stk5-61c';
+n_tmpl = 1;
+profile = 'stk5-183c';
 n_fband = 1;
 
 load(sprintf('data/templates/fbank-tmpls-%s-%d.mat', profile, n_tmpl));
@@ -14,9 +14,15 @@ end
 if ~exist('which_fbank', 'var')
     which_fbank = 'whiten';
 end
+if ~exist('tpl_idx', 'var')
+    tpl_idx = [];
+end
+if ~exist('n_tmpl_per_phone', 'var')
+    n_tmpl_per_phone = 0;
+end
 
 if strcmp(which_fbank, 'whiten')
-    load data/AllFbankdata_nonorm_memo.mat
+    load data/AllFbankdata_norm_memo.mat
 elseif strcmp(which_fbank, 'submean')
     load data/AllFbankdata_submean_memo.mat
 elseif strcmp(which_fbank, 'unitstd')
@@ -35,7 +41,7 @@ end
 parfor i=1:n_train
     fprintf(1, '%d / %d...\n', i, n_train);
     features_tr{i} = extract_frame_feature_vec(do_stack(traindata{i}, stack_num, use_delta), ...
-        tmpls_all, n_tmpl_per_phone, n_bin, n_fband);
+        tmpls_all, n_tmpl_per_phone, n_bin, n_fband, tpl_idx);
 end
 
 features_dev = cell(size(devsetdata));
@@ -43,7 +49,7 @@ n_dev = length(features_dev);
 parfor i=1:n_dev
     fprintf(1, '%d / %d...\n', i, n_dev);
     features_dev{i} = extract_frame_feature_vec(do_stack(devsetdata{i}, stack_num, use_delta), ...
-        tmpls_all, n_tmpl_per_phone, n_bin, n_fband);
+        tmpls_all, n_tmpl_per_phone, n_bin, n_fband, tpl_idx);
 end
 
 if isnumeric(n_bin)

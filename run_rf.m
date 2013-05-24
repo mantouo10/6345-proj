@@ -1,38 +1,27 @@
-addpath liblinear/liblinear-1.93/matlab
+addpath randomforest-matlab/RF_Class_C
 
 % set pseudo random number generator
 s = RandStream('mt19937ar','Seed',3085);
 RandStream.setDefaultStream(s);
 
-profile = 'stk5-183c';
-n_tmpl = 800;
-pool_profile = 'mean';
+profile = 'stk5-61c';
+n_tmpl = 3200;
+pool_profile = '6';
 
-liblinear_param = '-s 2 -c 100 -B 1';
 n_train = inf;
 normalization = 'pca';
-combine_fbank = 0;
 
 fprintf(1, '------------------- Experiment Summary --------------------\n');
 fprintf(1, 'Features: %s-%d-%s\n', profile, n_tmpl, pool_profile);
 fprintf(1, '#Train: %d per class\n', n_train);
 fprintf(1, 'Normalization: %s\n', normalization);
-fprintf(1, 'Classifier: %s\n', liblinear_param);
-fprintf(1, 'Combine filterbank: %d\n', combine_fbank);
 fprintf(1, '-----------------------------------------------------------\n');
 
 % load data
 fprintf(1, 'loading data...\n');
 %load data/fbank-invariance-features-bigarray-compact-debug.mat
-load data/fbank-stack1.mat
-%load(sprintf('data/fbank-invariance-features-bigarray-%s-%d-%s.mat', profile, n_tmpl, pool_profile));
-
-if combine_fbank
-    fprintf(1, 'combining with fbank feature...\n');
-    fbank_data = load('data/fbank-invariance-features-bigarray-compact-debug.mat');
-    features_tr = [features_tr fbank_data.features_tr];
-    features_dev = [features_dev fbank_data.features_dev];
-end
+%load data/fbank-stack1.mat
+load(sprintf('data/fbank-invariance-features-bigarray-%s-%d-%s.mat', profile, n_tmpl, pool_profile));
 
 trainlab_mg = 1+floor((trainlab-1)/3);
 devsetlab_mg = 1+floor((devsetlab-1)/3);
@@ -75,14 +64,17 @@ else
     error('unknown normalization: %s', normalization);
 end
 
-nor_features_tr_sp = sparse(double(nor_features_tr));
-nor_features_dev_sp = sparse(double(nor_features_dev));
+nor_features_tr_sp = (double(nor_features_tr));
+nor_features_dev_sp = (double(nor_features_dev));
 % save memory
 clear nor_features_tr nor_features_dev
 
 fprintf(1, 'training....\n');
 tic;
-model = train(double(trainlab_mg(subset_idx))', nor_features_tr_sp, liblinear_param);
+model = classRF_train(nor_features_tr_sp, trainlab_mg(subset_idx)');
 toc
 fprintf(1, 'predicting....\n');
-[I, acc] = predict(double(devsetlab_mg)', nor_features_dev_sp, model);
+pred = classRF_predict(nor_features_dev_sp, model);
+
+acc = sum(pred == devsetlab_mg')/length(pred);
+fprintf(1, 'Accuracy = %.4f\n', acc);
